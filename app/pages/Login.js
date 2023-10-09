@@ -1,68 +1,81 @@
-import { View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState, useContext} from 'react';
+import {BASE_URL} from '../Const';
+import axios from 'axios';
+import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import { Button, TextInput } from 'react-native-paper';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/RootActions";
+import {Button, Headline, TextInput} from 'react-native-paper';
+import { AuthContext } from '../AuthContext';
+import style from '../style';
 
 const Login = () => {
-  const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { store, setStore } = useContext(AuthContext);
   const navigation = useNavigation();
 
-  const userList = useSelector((state) => state.userReducer.userList);
-  
-  useEffect(async () => {
-    const auth = await AsyncStorage.getItem("user");
-    if (auth) {
-      navigation.navigate("home");
+  const toast = (msg) => {
+    return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
+  };
+
+  useEffect(() => {
+    if(store.user){
+      setEmail(store.user?.email);
+      setPassword(store.user?.password)
     }
   }, []);
 
   const handleLogin = () => {
-
+    console.log(store, 'store')
     let data = {
       email: email,
-      password: password
+      password: password,
     };
 
-    dispatch(loginUser(data,navigate))
-
+    axios
+      .post(BASE_URL + 'login', data)
+      .then(res => {
+        if (res?.data?.auth) {
+          setStore({
+            ...store,
+            user: res?.data?.user,
+            token: res?.data?.auth
+          })
+          toast('Login Successful');
+          navigation.navigate('home');
+        } else {
+          toast('please enter correct details');
+        }
+      })
+      .catch(() => {
+        toast('api err');
+      });
   };
 
   return (
     <View>
-      <Text>SignIn</Text>
+      <Headline style={style.heading}>SignIn</Headline>
+      <TextInput
+        style={style.inputs}
+        placeholder="Email"
+        value={email}
+        onChangeText={(e) => setEmail(e)}
+      />
+      <TextInput
+        style={style.inputs}
+        placeholder="Password"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={(e) => setPassword(e)}
+      />
 
-      <View>
-        <TextInput
-          size="small"
-          mode="outlined"
-          label="Email"
-          value={email}
-          onChangeText={(e) => setEmail(e.target.value)}
-        />
-      </View>
-      <br />
-
-      <View>
-        <TextInput
-          size="small"
-          mode="outlined"
-          type="password"
-          label="Password"
-          value={password}
-          onChangeText={(e) => setPassword(e.target.value)}
-        />
-      </View>
-      <br />
-        <Button size="small" mode="contained" onPress={() => handleLogin()}>
-          Save
-        </Button>
+      <Button
+        textColor="white"
+        style={style.btn}
+        onPress={() => handleLogin()}>
+        Save
+      </Button>
     </View>
-  )
-}
+  );
+};
 
 export default Login;

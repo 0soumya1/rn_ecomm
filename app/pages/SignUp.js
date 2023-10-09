@@ -1,102 +1,97 @@
-import { View, Text } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import {View, Text, ToastAndroid} from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import {BASE_URL} from '../Const';
+import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
-import { Button, TextInput } from 'react-native-paper';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch, useSelector} from "react-redux";
-import { signUP } from "../redux/Users/Action";
+import {Button, Headline, TextInput} from 'react-native-paper';
+import { AuthContext } from '../AuthContext';
+import style from '../style';
 
 const SignUp = () => {
-  const dispatch = useDispatch()
-  const [name, setName] = useState(""); 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { store, setStore } = useContext(AuthContext);
+//   const [error, setError] = useState(false);
   const navigation = useNavigation();
 
-  const userList = useSelector((state) => state.userReducer.userList);
+  const toast = (msg) => {
+    return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
+  };
 
-  useEffect(async() => {
-    const auth = await AsyncStorage.getItem("user");
-    if (auth) {
-      navigation.navigate("home");
-    }
+  useEffect(() => {
+    if(store.user){
+        setName(store.user?.name);
+        setEmail(store.user?.email);
+        setPassword(store.user?.password);
+      }
   }, []);
 
   const collectData = () => {
-    if ((!name, !email, !password)) {
-      setError(true);
-      return false;
-    }
+    // if ((!name, !email, !password)) {
+    //   setError(true);
+    //   return false;
+    // }
 
     let data = {
       name: name,
       email: email,
-      password: password
+      password: password,
     };
 
-    dispatch(signUP(data, navigate))
-
+    axios
+      .post(BASE_URL + 'register', data)
+      .then(res => {
+        if (res?.data?.auth) {
+            setStore({
+                ...store,
+                user: res?.data?.result,
+                token: res?.data?.auth
+              })
+        //   AsyncStorage.setItem('user', res?.data?.result);
+        //   AsyncStorage.setItem('token', res?.data?.auth);
+          toast('SignUp Successful');
+          navigation.navigate('home');
+        } else {
+          toast('please enter correct details');
+        }
+      })
+      .catch(() => {
+        toast('api signup err');
+      });
   };
 
   return (
     <View>
-      <Text>Register</Text>
-
-      <View>
-        <TextInput
-          size="small"
-          mode="outlined"
-          label="Name"
-          value={name}
-          onChangeText={(e) => setName(e.target.value)}
-        />
-      </View>
-      <br />
-      {error && !name && (
-        <Text className="invalid-input">Enter Valid Name</Text>
-      )}
-
-      <View>
-        <TextInput
-          mode="outlined"
-          size="small"
-          label="Email"
-          value={email}
-          onChangeText={(e) => setEmail(e.target.value)}
-        />
-      </View>
-      <br />
-      {error && !email && (
-        <Text className="invalid-input">Enter Valid Email</Text>
-      )}
-      <View>
-        <TextInput
-          mode="outlined"
-          size="small"
-          type="password"
-          label="Password"
-          value={password}
-          onChangeText={(e) => setPassword(e.target.value)}
-        />
-      </View>
-      <br />
-      {error && !password && (
-        <Text className="invalid-input" style={{ marginLeft: "-60px" }}>
-          Enter Valid Password
-        </Text>
-      )}
+      <Headline style={style.heading}>SignUp</Headline>
+      <TextInput
+        style={style.inputs}
+        placeholder="Name"
+        value={name}
+        onChangeText={(e) => setName(e)}
+      />
+      <TextInput
+        style={style.inputs}
+        placeholder="Email"
+        value={email}
+        onChangeText={(e) => setEmail(e)}
+      />
+      <TextInput
+        style={style.inputs}
+        placeholder="Password"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={(e) => setPassword(e)}
+      />
 
       <Button
-        size="small"
-        style={{ width: "100px" }}
-        mode="contained"
-        onPress={()=>collectData()}
-      >
-        SignUp
+        textColor="white"
+        style={style.btn}
+        onPress={() => collectData()}>
+        Save
       </Button>
     </View>
-  )
-}
+  );
+};
 
-export default SignUp
+export default SignUp;

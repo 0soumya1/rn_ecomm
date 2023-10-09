@@ -1,20 +1,20 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {PaperProvider} from 'react-native-paper';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {AuthContext} from './app/AuthContext';
 import Routes from './app/routes';
+// import store from './app/redux/Store';
+// import {Provider} from 'react-redux';
 
 export default function App() {
-  const [store, setStore] = useState({});
   return (
     <>
-      <AuthContext.Provider value={{store, setStore}}>
+      {/* <Provider store={store}> */}
         <SafeAreaProvider>
           <PaperProvider>
             <Routes />
           </PaperProvider>
         </SafeAreaProvider>
-      </AuthContext.Provider>
+      {/* </Provider> */}
     </>
   );
 }

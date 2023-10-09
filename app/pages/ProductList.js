@@ -1,33 +1,76 @@
-import {View, Text, FlatList} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {View, Text, FlatList, ToastAndroid} from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import axios from 'axios';
+import {BASE_URL} from '../Const';
 import {useNavigation} from '@react-navigation/native';
-import {Button, Searchbar, ActivityIndicator} from 'react-native-paper';
-import Fontisto from 'react-native-vector-icons/Fontisto';
+import {AuthContext} from '../AuthContext';
+import style from '../style';
+import {
+  Button,
+  Searchbar,
+  ActivityIndicator,
+  Headline,
+} from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useDispatch, useSelector} from 'react-redux';
-import {getItemList} from '../redux/Items/Action';
-import {deleteItem} from '../redux/Items/Action';
 
 const ProductList = () => {
+  const [products, setProducts] = useState([]);
   const [itemList1, setItemList1] = useState([]);
   const [itemList2, setItemList2] = useState([]);
+  const {store, setStore} = useContext(AuthContext);
 
-  const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const itemList = useSelector(state => state.itemReducer.itemList);
+  const headerData = {
+    authorization: `bearer ${store.token}`,
+  };
+
+  const toast = msg => {
+    return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
+  };
 
   useEffect(() => {
-    dispatch(getItemList());
+    setItemList1(products);
+    setItemList2(products);
+  }, [products]);
+
+  useEffect(() => {
+    getProducts();
   }, []);
 
-  useEffect(() => {
-    setItemList1(itemList);
-    setItemList2(itemList);
-  }, [itemList]);
+  const getProducts = () => {
+    axios
+      .get(BASE_URL + 'products', {
+        headers: headerData,
+      })
+      .then(resp => {
+        if (resp?.data) {
+          setProducts(resp.data);
+        } else {
+          toast('not found');
+        }
+      })
+      .catch(() => {
+        toast('err in get api call');
+      });
+  };
 
-  const deleteProduct = (id) => {
-    dispatch(deleteItem(id));
+  const deleteProduct = id => {
+    axios
+      .delete(BASE_URL + `product/${id}`, {
+        headers: headerData,
+      })
+      .then(resp => {
+        if (resp.data) {
+          getProducts(resp.data);
+          toast('Item Deleted');
+        } else {
+          toast('not deleted');
+        }
+      })
+      .catch(() => {
+        toast('err in delete api call');
+      });
   };
 
   const handleSearch = key => {
@@ -44,66 +87,44 @@ const ProductList = () => {
 
   return (
     <View>
-      <Text>Food Items</Text>
-
-      <View className="row1">
+      <Headline>Food Items</Headline>
+      <>
         <View>
-          <Searchbar
-            placeholder="Search"
-            size="small"
-            onChangeText={e => handleSearch(e.target.value)}
-          />
+          <Searchbar placeholder="Search" onChangeText={e => handleSearch(e)} />
         </View>
+
         <View>
           <Button mode="contained" onPress={() => navigation.navigate('add')}>
-            <Fontisto name="shopping-basket-add" style={{fontSize: 30}} />
             Add
           </Button>
         </View>
-      </View>
-      <br />
+      </>
+
       {itemList1.length > 0 ? (
-        <>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+        <FlatList
+          data={itemList1}
+          renderItem={({item}) => (
+            <View keyExtractor={item => item._id} style={style.table}>
+              <Text style={{textTransform: 'uppercase'}}>{item?.name}</Text>
+              <Text>₹ {item?.price}</Text>
+              <Text>{item?.category}</Text>
 
-            <tbody>
-              <FlatList>
-                data={itemList1}
-                renderItem=
-                {({item}) => (
-                  <tr keyExtractor={item=>item._id}>
-                    <td style={{textTransform: 'uppercase'}}>{item.name}</td>
-                    <td>₹ {item.price}</td>
-                    <td>{item.category}</td>
-                    <td>
-                      <MaterialIcons
-                        name="edit"
-                        style={{fontSize: 10}}
-                        className="icon"
-                        onPress={() => navigation.navigate('update' + item._id)}
-                      />
+              <MaterialIcons
+                name="edit"
+                style={{fontSize: 20}}
+                className="icon"
+                onPress={() => navigation.navigate('update')}
+              />
 
-                      <MaterialIcons
-                        name="delete"
-                        style={{fontSize: 10}}
-                        className="icon"
-                        onPress={() => deleteProduct(item._id)}
-                      />
-                    </td>
-                  </tr>
-                )}
-              </FlatList>
-            </tbody>
-          </table>
-        </>
+              <MaterialIcons
+                name="delete"
+                style={{fontSize: 20}}
+                className="icon"
+                onPress={() => deleteProduct(item._id)}
+              />
+            </View>
+          )}
+        />
       ) : (
         <ActivityIndicator animating={true} />
       )}
