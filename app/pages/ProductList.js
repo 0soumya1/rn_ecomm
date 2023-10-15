@@ -6,7 +6,6 @@ import {useNavigation} from '@react-navigation/native';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 import {
-  Button,
   Searchbar,
   ActivityIndicator,
   Headline,
@@ -44,6 +43,7 @@ const ProductList = () => {
         headers: headerData,
       })
       .then(resp => {
+        console.log(resp?.data, 'getproduct list');
         if (resp?.data) {
           setProducts(resp.data);
         } else {
@@ -56,11 +56,13 @@ const ProductList = () => {
   };
 
   const deleteProduct = id => {
+    console.log(id, 'product id deleted');
     axios
       .delete(BASE_URL + `product/${id}`, {
         headers: headerData,
       })
       .then(resp => {
+        console.log(resp.data, 'item deleted');
         if (resp.data) {
           getProducts(resp.data);
           toast('Item Deleted');
@@ -85,18 +87,33 @@ const ProductList = () => {
     setItemList1(result);
   };
 
+  const handleEdit = item => {
+    console.log(item, 'item');
+    navigation.navigate('update', item);
+  };
+
   return (
     <View>
-      <Headline>Food Items</Headline>
+      <Headline style={style.head}>Food Items</Headline>
       <>
-        <View>
-          <Searchbar placeholder="Search" onChangeText={e => handleSearch(e)} />
-        </View>
+        <View style={style.row}>
+          <Searchbar
+            style={style.searchBar}
+            placeholder="Search"
+            onChangeText={e => handleSearch(e)}
+          />
 
-        <View>
-          <Button mode="contained" onPress={() => navigation.navigate('add')}>
-            Add
-          </Button>
+          <MaterialIcons
+            name="add"
+            style={{fontSize: 40, color: 'purple'}}
+            onPress={() => navigation.navigate('add')}
+          />
+
+          <MaterialIcons
+            name="refresh"
+            style={{fontSize: 35, color: 'purple'}}
+            onPress={() => getProducts()}
+          />
         </View>
       </>
 
@@ -105,21 +122,21 @@ const ProductList = () => {
           data={itemList1}
           renderItem={({item}) => (
             <View keyExtractor={item => item._id} style={style.table}>
-              <Text style={{textTransform: 'uppercase'}}>{item?.name}</Text>
-              <Text>₹ {item?.price}</Text>
-              <Text>{item?.category}</Text>
+              <Text style={{textTransform: 'uppercase', width: 75}}>
+                {item?.name}
+              </Text>
+              <Text style={{width: 50}}>₹ {item?.price}</Text>
+              <Text style={{width: 75}}>{item?.category}</Text>
 
               <MaterialIcons
                 name="edit"
-                style={{fontSize: 20}}
-                className="icon"
-                onPress={() => navigation.navigate('update')}
+                style={{fontSize: 20, color: 'purple'}}
+                onPress={() => handleEdit(item)}
               />
 
               <MaterialIcons
                 name="delete"
-                style={{fontSize: 20}}
-                className="icon"
+                style={{fontSize: 20, color: 'purple'}}
                 onPress={() => deleteProduct(item._id)}
               />
             </View>

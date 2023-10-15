@@ -11,8 +11,9 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [type, setType] = useState("Sign Up");
   const { store, setStore } = useContext(AuthContext);
-//   const [error, setError] = useState(false);
+  const [error, setError] = useState(false);
   const navigation = useNavigation();
 
   const toast = (msg) => {
@@ -28,15 +29,15 @@ const SignUp = () => {
   }, []);
 
   const collectData = () => {
-    // if ((!name, !email, !password)) {
-    //   setError(true);
-    //   return false;
-    // }
+    if ((!name, !email, !password)) {
+      setError(true);
+      return false;
+    }
 
     let data = {
-      name: name,
-      email: email,
-      password: password,
+      name: name.trim(),
+      email: email.trim(),
+      password: password.trim(),
     };
 
     axios
@@ -48,8 +49,6 @@ const SignUp = () => {
                 user: res?.data?.result,
                 token: res?.data?.auth
               })
-        //   AsyncStorage.setItem('user', res?.data?.result);
-        //   AsyncStorage.setItem('token', res?.data?.auth);
           toast('SignUp Successful');
           navigation.navigate('home');
         } else {
@@ -61,21 +60,38 @@ const SignUp = () => {
       });
   };
 
+  const handleFlickType = () => {
+    if (type == "Sign Up") {
+      setType("Sign In");
+      navigation.navigate("login")
+    } else {
+      setType("Sign Up");
+    }
+  };
+
   return (
     <View>
-      <Headline style={style.heading}>SignUp</Headline>
+      <Headline style={style.heading}>Sign Up</Headline>
       <TextInput
         style={style.inputs}
         placeholder="Name"
         value={name}
         onChangeText={(e) => setName(e)}
       />
+      {error && !name && (
+        <Text style={style.invalid}>Enter Valid Name</Text>
+      )}
+
       <TextInput
         style={style.inputs}
         placeholder="Email"
         value={email}
         onChangeText={(e) => setEmail(e)}
       />
+      {error && !email && (
+        <Text style={style.invalid}>Enter Valid Email</Text>
+      )}
+
       <TextInput
         style={style.inputs}
         placeholder="Password"
@@ -83,6 +99,9 @@ const SignUp = () => {
         value={password}
         onChangeText={(e) => setPassword(e)}
       />
+      {error && !password && (
+        <Text style={style.invalid}>Enter Valid Password</Text>
+      )}
 
       <Button
         textColor="white"
@@ -90,6 +109,14 @@ const SignUp = () => {
         onPress={() => collectData()}>
         Save
       </Button>
+
+      {!store.user && (
+        <Text style={{ margin: 20 , alignSelf:"center" }} onPress={handleFlickType}>
+          {type == "Sign Up"
+            ? "Already have account? Sign In"
+            : "New Here? Sign Up"}
+        </Text>
+      )}
     </View>
   );
 };

@@ -6,6 +6,7 @@ import Routes from './app/routes';
 
 export default function App() {
   const [store, setStore] = useState({});
+
   return (
     <>
       <AuthContext.Provider value={{store, setStore}}>

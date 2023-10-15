@@ -6,14 +6,13 @@ import {useNavigation} from '@react-navigation/native';
 import {Button, Headline, TextInput} from 'react-native-paper';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
-// import Select from 'react-select';
-// import RNPickerSelect from 'react-native-picker-select';
+// import SelectDropdown from 'react-native-select-dropdown';
 
 const AddProduct = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
-  //   const [error, setError] = useState(false);
+  const [error, setError] = useState(false);
   const {store, setStore} = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -25,30 +24,31 @@ const AddProduct = () => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
   };
 
-//   const categoryOptions = [
-//     {value: 'Breakfast', label: 'Breakfast'},
-//     {value: 'Lunch', label: 'Lunch'},
-//     {value: 'Snacks', label: 'Snacks'},
-//     {value: 'Dinner', label: 'Dinner'},
-//   ];
+  // const categoryOptions = [
+  //   {value: 'Breakfast', label: 'Breakfast'},
+  //   {value: 'Lunch', label: 'Lunch'},
+  //   {value: 'Snacks', label: 'Snacks'},
+  //   {value: 'Dinner', label: 'Dinner'},
+  // ];
 
-//   const handleCategoryChange = e => {
-//     console.log(e, 'e');
-//     setCategory(e);
-//   };
+  // const handleCategoryChange = (e) => {
+  //   setCategory(e);
+  // };
+
+  // const categoryOptions = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
 
   const addProduct = () => {
-    // if ((!name, !price, !category?.label)) {
-    //   setError(true);
-    //   return false;
-    // }
+    if ((!name, !price, !category)) {
+      setError(true);
+      return false;
+    }
 
-    const userId = store._id;
+    const userId = store.user._id;
 
     let data = {
       name: name,
       price: price,
-      category: category?.label,
+      category: category,
       userId: userId,
     };
 
@@ -56,8 +56,9 @@ const AddProduct = () => {
       .post(BASE_URL + 'add-product', data, {
         headers: headerData,
       })
-      .then(res => {
-        if (res?.data) {
+      .then(resp => {
+        console.log(resp?.data, "item added")
+        if (resp?.data) {
           toast('Item Added');
           navigation.navigate('home');
         } else {
@@ -67,7 +68,6 @@ const AddProduct = () => {
       .catch(() => {
         toast('err in add api call');
       });
-    
   };
 
   return (
@@ -80,32 +80,52 @@ const AddProduct = () => {
         value={name}
         onChangeText={e => setName(e)}
       />
+      {error && !name && (
+        <Text style={style.invalid}>Enter Valid Name</Text>
+      )}
+
       <TextInput
         style={style.inputs}
-        inputMode='numeric'
+        inputMode="numeric"
         placeholder="Price"
         value={price}
         onChangeText={e => setPrice(e)}
       />
+      {error && !price && (
+        <Text style={style.invalid}>Enter Valid Price</Text>
+      )}
 
-      {/* <Select
-        placeholder="Select Category"
+      <TextInput
+        style={style.inputs}
+        placeholder="Category"
         value={category}
-        options={categoryOptions}
+        onChangeText={e => setCategory(e)}
+      />
+      {error && !category && (
+        <Text style={style.invalid}>Enter Valid Category</Text>
+      )}
+
+        {/* <Select
+          placeholder="Select Category"
+          value={category}
+          options={categoryOptions}
+          onChange={e => handleCategoryChange(e)}
+        /> */}
+
+      {/* <SelectDropdown
+        data={categoryOptions}
+        onSelect={(selectedItem, index) => {
+          console.log(selectedItem, index);
+        }}
+        buttonTextAfterSelection={(selectedItem, index) => {
+          return selectedItem.label;
+        }}
+        rowTextForSelection={(item, index) => {
+          return item.label;
+        }}
+        value={category}
         onChangeText={e => handleCategoryChange(e)}
       /> */}
-
-      {/* <View style={style.container}>
-        <RNPickerSelect
-          onValueChange={value => console.log(value)}
-          items={[
-            {value: 'Breakfast', label: 'Breakfast'},
-            {value: 'Lunch', label: 'Lunch'},
-            {value: 'Snacks', label: 'Snacks'},
-            {value: 'Dinner', label: 'Dinner'},
-          ]}
-        />
-      </View> */}
 
       <Button textColor="white" style={style.btn} onPress={() => addProduct()}>
         Save

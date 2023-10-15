@@ -1,15 +1,17 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {BASE_URL} from '../Const';
 import axios from 'axios';
-import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
+import {View, Text, ToastAndroid} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Button, Headline, TextInput} from 'react-native-paper';
 import { AuthContext } from '../AuthContext';
 import style from '../style';
 
-const Login = () => {
+const Login = () => { 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [type, setType] = useState("Sign In");
+
   const { store, setStore } = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -27,8 +29,8 @@ const Login = () => {
   const handleLogin = () => {
     console.log(store, 'store')
     let data = {
-      email: email,
-      password: password,
+      email: email.trim(),
+      password: password.trim(),
     };
 
     axios
@@ -51,9 +53,18 @@ const Login = () => {
       });
   };
 
+  const handleFlickType = () => {
+    if (type == "Sign In") {
+      setType("Sign Up");
+      navigation.navigate("signup")
+    } else {
+      setType("Sign In");
+    }
+  };
+
   return (
     <View>
-      <Headline style={style.heading}>SignIn</Headline>
+      <Headline style={style.heading}>Sign In</Headline>
       <TextInput
         style={style.inputs}
         placeholder="Email"
@@ -74,6 +85,15 @@ const Login = () => {
         onPress={() => handleLogin()}>
         Save
       </Button>
+
+      {!store.user && (
+        <Text style={{ margin: 20 , alignSelf:"center" }} onPress={handleFlickType}>
+          {type == "Sign In"
+            ? "New Here? Sign Up"
+            : "Already have account? Sign In"}
+        </Text>
+      )}
+
     </View>
   );
 };

@@ -6,16 +6,16 @@ import ProductList from '../app/pages/ProductList';
 import AddProduct from '../app/pages/AddProduct';
 import UpdateProduct from '../app/pages/UpdateProduct';
 import SignUp from '../app/pages/SignUp';
-// import Nav from '../app/pages/Nav';
+import Nav from '../app/pages/Nav';
 
 const stack = createNativeStackNavigator();
 const Routes = () => {
   return (
     <>
       <NavigationContainer>
-        {/* <Nav/> */}
+        <Nav/>
         <stack.Navigator
-          // screenOptions={{headerShown: false}}
+          screenOptions={{headerShown: false}}
           initialRouteName="login">
           <stack.Screen name="login" component={Login} />
           <stack.Screen name="home" component={ProductList} />
