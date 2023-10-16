@@ -57,7 +57,6 @@ const AddProduct = () => {
         headers: headerData,
       })
       .then(resp => {
-        console.log(resp?.data, "item added")
         if (resp?.data) {
           toast('Item Added');
           navigation.navigate('home');

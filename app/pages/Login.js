@@ -4,30 +4,30 @@ import axios from 'axios';
 import {View, Text, ToastAndroid} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Button, Headline, TextInput} from 'react-native-paper';
-import { AuthContext } from '../AuthContext';
+import {AuthContext} from '../AuthContext';
 import style from '../style';
 
-const Login = () => { 
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [type, setType] = useState("Sign In");
+  const [type, setType] = useState('Sign In');
 
-  const { store, setStore } = useContext(AuthContext);
+  const {store, setStore} = useContext(AuthContext);
   const navigation = useNavigation();
 
-  const toast = (msg) => {
+  const toast = msg => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
   };
 
   useEffect(() => {
-    if(store.user){
+    if (store.user) {
       setEmail(store.user?.email);
-      setPassword(store.user?.password)
+      setPassword(store.user?.password);
     }
   }, []);
 
   const handleLogin = () => {
-    console.log(store, 'store')
+    console.log(store, 'store');
     let data = {
       email: email.trim(),
       password: password.trim(),
@@ -40,8 +40,8 @@ const Login = () => {
           setStore({
             ...store,
             user: res?.data?.user,
-            token: res?.data?.auth
-          })
+            token: res?.data?.auth,
+          });
           toast('Login Successful');
           navigation.navigate('home');
         } else {
@@ -54,11 +54,11 @@ const Login = () => {
   };
 
   const handleFlickType = () => {
-    if (type == "Sign In") {
-      setType("Sign Up");
-      navigation.navigate("signup")
+    if (type == 'Sign In') {
+      setType('Sign Up');
+      navigation.navigate('signup');
     } else {
-      setType("Sign In");
+      setType('Sign In');
     }
   };
 
@@ -69,31 +69,27 @@ const Login = () => {
         style={style.inputs}
         placeholder="Email"
         value={email}
-        onChangeText={(e) => setEmail(e)}
+        onChangeText={e => setEmail(e)}
       />
       <TextInput
         style={style.inputs}
         placeholder="Password"
         secureTextEntry={true}
         value={password}
-        onChangeText={(e) => setPassword(e)}
+        onChangeText={e => setPassword(e)}
       />
 
-      <Button
-        textColor="white"
-        style={style.btn}
-        onPress={() => handleLogin()}>
+      <Button textColor="white" style={style.btn} onPress={() => handleLogin()}>
         Save
       </Button>
 
       {!store.user && (
-        <Text style={{ margin: 20 , alignSelf:"center" }} onPress={handleFlickType}>
-          {type == "Sign In"
-            ? "New Here? Sign Up"
-            : "Already have account? Sign In"}
+        <Text
+          style={{margin: 20, alignSelf: 'center'}}
+          onPress={handleFlickType}>
+          {'New Here? Sign Up'}
         </Text>
       )}
-
     </View>
   );
 };

@@ -10,10 +10,12 @@ export default StyleSheet.create({
     margin: 3,
   },
 
-  inputs: {
-    backgroundColor: 'white',
-    marginHorizontal: 50,
-    marginVertical: 5,
+  head: {
+    fontSize: 22,
+    alignSelf: 'center',
+    color: 'purple',
+    marginBottom: 10,
+    fontWeight: 'bold',
   },
 
   heading: {
@@ -23,12 +25,10 @@ export default StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  head: {
-    fontSize: 22,
-    alignSelf: 'center',
-    color: 'purple',
-    marginBottom: 10,
-    fontWeight: 'bold',
+  inputs: {
+    backgroundColor: 'white',
+    marginHorizontal: 50,
+    marginVertical: 5,
   },
 
   btn: {

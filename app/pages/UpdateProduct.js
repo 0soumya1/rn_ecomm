@@ -49,7 +49,6 @@ const UpdateProduct = () => {
       })
       .then(res => {
         if (res?.data) {
-          console.log(res?.data, 'get product detail');
           setName(res?.data?.name);
           setPrice(res?.data?.price);
           setCategory(res?.data?.category);
@@ -75,7 +74,6 @@ const UpdateProduct = () => {
       })
       .then(res => {
         if (res?.data) {
-          console.log(res?.data, 'updated item');
           toast('Item Updated');
           navigation.navigate('home');
         } else {

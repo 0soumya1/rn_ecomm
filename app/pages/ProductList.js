@@ -43,7 +43,6 @@ const ProductList = () => {
         headers: headerData,
       })
       .then(resp => {
-        console.log(resp?.data, 'getproduct list');
         if (resp?.data) {
           setProducts(resp.data);
         } else {
@@ -56,13 +55,11 @@ const ProductList = () => {
   };
 
   const deleteProduct = id => {
-    console.log(id, 'product id deleted');
     axios
       .delete(BASE_URL + `product/${id}`, {
         headers: headerData,
       })
       .then(resp => {
-        console.log(resp.data, 'item deleted');
         if (resp.data) {
           getProducts(resp.data);
           toast('Item Deleted');
@@ -88,7 +85,6 @@ const ProductList = () => {
   };
 
   const handleEdit = item => {
-    console.log(item, 'item');
     navigation.navigate('update', item);
   };
 

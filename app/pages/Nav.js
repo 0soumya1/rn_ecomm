@@ -9,7 +9,6 @@ import style from '../style';
 const Nav = () => {
   const {store, setStore} = useContext(AuthContext);
   const auth = store?.user;
-  console.log(auth, 'auth');
   const navigation = useNavigation();
 
   const [visible, setVisible] = React.useState(false);
@@ -25,29 +24,39 @@ const Nav = () => {
 
   return (
     <>
-      <Appbar.Header style={style.navbar}>
-        <Headline
-          style={{fontSize: 20, fontWeight: 'bold'}}
-          onPress={() => navigation.navigate('home')}>
-          Admin Panel
-        </Headline>
+      {auth ? (
+        <>
+          <Appbar.Header style={style.navbar}>
+            <Headline
+              style={{fontSize: 20, fontWeight: 'bold'}}
+              onPress={() => navigation.navigate('home')}>
+              Admin Panel
+            </Headline>
 
-        <AntDesign
-          onPress={showDialog}
-          name="logout"
-          style={{fontSize: 20, fontWeight: 'bold'}}
-        />
+            <AntDesign
+              onPress={showDialog}
+              name="logout"
+              style={{fontSize: 25}}
+            />
 
-        <Portal>
-          <Dialog visible={visible} onDismiss={hideDialog}>
-            <Dialog.Title>Logout ?</Dialog.Title>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>No</Button>
-              <Button onPress={handleLogout}>Yes</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-      </Appbar.Header>
+            <Portal>
+              <Dialog visible={visible} onDismiss={hideDialog}>
+                <Dialog.Title>Logout ?</Dialog.Title>
+                <Dialog.Actions>
+                  <Button onPress={hideDialog}>No</Button>
+                  <Button onPress={handleLogout}>Yes</Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+          </Appbar.Header>
+        </>
+      ) : (
+        <Appbar.Header>
+          <Headline style={{fontSize: 20, fontWeight: 'bold'}}>
+            Admin Panel
+          </Headline>
+        </Appbar.Header>
+      )}
     </>
   );
 };

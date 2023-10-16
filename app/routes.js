@@ -22,7 +22,6 @@ const Routes = () => {
           <stack.Screen name="add" component={AddProduct} />
           <stack.Screen name="update" component={UpdateProduct} />
           <stack.Screen name="signup" component={SignUp} />
-          {/* <stack.Screen name="logout" component={Logout} /> */}
         </stack.Navigator>
       </NavigationContainer>
     </>
