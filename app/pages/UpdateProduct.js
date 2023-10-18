@@ -3,7 +3,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../Const';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Button, Headline, TextInput} from 'react-native-paper';
+import {Button, Headline, TextInput, ActivityIndicator} from 'react-native-paper';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 // import SelectDropdown from 'react-native-select-dropdown';
@@ -12,6 +12,7 @@ const UpdateProduct = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
+  const [loading, setLoading] = useState(false);
   const {store, setStore} = useContext(AuthContext);
 
   const navigation = useNavigation();
@@ -52,17 +53,22 @@ const UpdateProduct = () => {
           setName(res?.data?.name);
           setPrice(res?.data?.price);
           setCategory(res?.data?.category);
+          setLoading(false);
           // setCategory({value: res?.data?.category, label: res?.data?.category});
         } else {
           toast('no record found');
+          setLoading(false);
         }
       })
       .catch(() => {
         toast('err in getitem api call');
+        setLoading(false);
       });
   };
 
   const updateProduct = () => {
+    setLoading(true);
+   
     const data = {
       name: name,
       price: price,
@@ -75,13 +81,16 @@ const UpdateProduct = () => {
       .then(res => {
         if (res?.data) {
           toast('Item Updated');
-          navigation.navigate('home');
+          navigation.navigate("home", Math.random());
+          setLoading(false);
         } else {
           toast('no record found');
+          setLoading(false);
         }
       })
       .catch(() => {
         toast('err in update api call');
+        setLoading(false);
       });
   };
   return (
@@ -122,13 +131,15 @@ const UpdateProduct = () => {
           return item.label;
         }}
       /> */}
-
-      <Button
-        textColor="white"
-        style={style.btn}
-        onPress={() => updateProduct()}>
-        Save
-      </Button>
+      {!loading && (
+        <Button
+          textColor="white"
+          style={style.btn}
+          onPress={() => updateProduct()}>
+          Save
+        </Button>
+      )}
+      {loading && <ActivityIndicator animating={true} />}
     </View>
   );
 };

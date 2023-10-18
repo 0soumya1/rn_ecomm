@@ -3,13 +3,14 @@ import {BASE_URL} from '../Const';
 import axios from 'axios';
 import {View, Text, ToastAndroid} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Button, Headline, TextInput} from 'react-native-paper';
+import {Button, Headline, TextInput, ActivityIndicator} from 'react-native-paper';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [type, setType] = useState('Sign In');
 
   const {store, setStore} = useContext(AuthContext);
@@ -27,7 +28,7 @@ const Login = () => {
   }, []);
 
   const handleLogin = () => {
-    console.log(store, 'store');
+    setLoading(true);
     let data = {
       email: email.trim(),
       password: password.trim(),
@@ -42,14 +43,17 @@ const Login = () => {
             user: res?.data?.user,
             token: res?.data?.auth,
           });
-          toast('Login Successful');
+          toast('SignIn Successful');
           navigation.navigate('home');
+          setLoading(false);
         } else {
           toast('please enter correct details');
+          setLoading(false);
         }
       })
       .catch(() => {
         toast('api err');
+        setLoading(false);
       });
   };
 
@@ -79,9 +83,14 @@ const Login = () => {
         onChangeText={e => setPassword(e)}
       />
 
-      <Button textColor="white" style={style.btn} onPress={() => handleLogin()}>
-        Save
-      </Button>
+      {!loading && (
+        <Button
+          textColor="white"
+          style={style.btn}
+          onPress={() => handleLogin()}>
+          Save
+        </Button>
+      )}
 
       {!store.user && (
         <Text
@@ -90,6 +99,7 @@ const Login = () => {
           {'New Here? Sign Up'}
         </Text>
       )}
+      {loading && <ActivityIndicator animating={true} />}
     </View>
   );
 };

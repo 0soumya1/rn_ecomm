@@ -2,7 +2,7 @@ import {View, Text, FlatList, ToastAndroid} from 'react-native';
 import React, {useEffect, useState, useContext} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../Const';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 import {
@@ -19,6 +19,7 @@ const ProductList = () => {
   const {store, setStore} = useContext(AuthContext);
 
   const navigation = useNavigation();
+  const route = useRoute();
 
   const headerData = {
     authorization: `bearer ${store.token}`,
@@ -35,7 +36,7 @@ const ProductList = () => {
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [route?.params]);
 
   const getProducts = () => {
     axios
@@ -101,14 +102,8 @@ const ProductList = () => {
 
           <MaterialIcons
             name="add"
-            style={{fontSize: 40, color: 'purple'}}
+            style={{fontSize: 50, color: 'purple'}}
             onPress={() => navigation.navigate('add')}
-          />
-
-          <MaterialIcons
-            name="refresh"
-            style={{fontSize: 35, color: 'purple'}}
-            onPress={() => getProducts()}
           />
         </View>
       </>

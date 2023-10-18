@@ -3,7 +3,12 @@ import React, {useState, useContext} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../Const';
 import {useNavigation} from '@react-navigation/native';
-import {Button, Headline, TextInput} from 'react-native-paper';
+import {
+  Button,
+  Headline,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native-paper';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 // import SelectDropdown from 'react-native-select-dropdown';
@@ -13,6 +18,7 @@ const AddProduct = () => {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {store, setStore} = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -38,7 +44,10 @@ const AddProduct = () => {
   // const categoryOptions = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
 
   const addProduct = () => {
+    setLoading(true);
+
     if ((!name, !price, !category)) {
+      setLoading(false);
       setError(true);
       return false;
     }
@@ -59,13 +68,16 @@ const AddProduct = () => {
       .then(resp => {
         if (resp?.data) {
           toast('Item Added');
-          navigation.navigate('home');
+          navigation.navigate("home", Math.random());
+          setLoading(false);
         } else {
           toast('not found');
+          setLoading(false);
         }
       })
       .catch(() => {
         toast('err in add api call');
+        setLoading(false);
       });
   };
 
@@ -79,9 +91,7 @@ const AddProduct = () => {
         value={name}
         onChangeText={e => setName(e)}
       />
-      {error && !name && (
-        <Text style={style.invalid}>Enter Valid Name</Text>
-      )}
+      {error && !name && <Text style={style.invalid}>Enter Valid Name</Text>}
 
       <TextInput
         style={style.inputs}
@@ -90,9 +100,7 @@ const AddProduct = () => {
         value={price}
         onChangeText={e => setPrice(e)}
       />
-      {error && !price && (
-        <Text style={style.invalid}>Enter Valid Price</Text>
-      )}
+      {error && !price && <Text style={style.invalid}>Enter Valid Price</Text>}
 
       <TextInput
         style={style.inputs}
@@ -104,7 +112,7 @@ const AddProduct = () => {
         <Text style={style.invalid}>Enter Valid Category</Text>
       )}
 
-        {/* <Select
+      {/* <Select
           placeholder="Select Category"
           value={category}
           options={categoryOptions}
@@ -125,10 +133,15 @@ const AddProduct = () => {
         value={category}
         onChangeText={e => handleCategoryChange(e)}
       /> */}
-
-      <Button textColor="white" style={style.btn} onPress={() => addProduct()}>
-        Save
-      </Button>
+      {!loading && (
+        <Button
+          textColor="white"
+          style={style.btn}
+          onPress={() => addProduct()}>
+          Save
+        </Button>
+      )}
+      {loading && <ActivityIndicator animating={true} />}
     </View>
   );
 };
