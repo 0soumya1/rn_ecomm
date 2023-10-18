@@ -74,9 +74,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.rn_ecomm"
+    namespace "com.greenplay.adminpanel"
     defaultConfig {
-        applicationId "com.rn_ecomm"
+        applicationId "com.greenplay.adminpanel"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
