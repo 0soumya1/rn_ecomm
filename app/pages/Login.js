@@ -43,7 +43,7 @@ const Login = () => {
             user: res?.data?.user,
             token: res?.data?.auth,
           });
-          toast('SignIn Successful');
+          toast('Login Successful');
           navigation.navigate('home');
           setLoading(false);
         } else {
