@@ -1,21 +1,26 @@
-import {View, Text, FlatList, ToastAndroid} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ToastAndroid,
+  ScrollView,
+  Appearance,
+} from 'react-native';
 import React, {useEffect, useState, useContext} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../Const';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
-import {
-  Searchbar,
-  ActivityIndicator,
-  Headline,
-} from 'react-native-paper';
+import {Searchbar, ActivityIndicator, Headline} from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [itemList1, setItemList1] = useState([]);
   const [itemList2, setItemList2] = useState([]);
+  // const [theme, setTheme] = useState('');
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const {store, setStore} = useContext(AuthContext);
 
   const navigation = useNavigation();
@@ -24,10 +29,30 @@ const ProductList = () => {
   const headerData = {
     authorization: `bearer ${store.token}`,
   };
+  // console.log('token------------', headerData);
 
   const toast = msg => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
   };
+
+  Appearance.addChangeListener(scheme => {
+    setTheme(scheme.colorScheme);
+  });
+
+  // useEffect(() => {
+  //   // const colorScheme = Appearance.getColorScheme();
+  //   const listener = Appearance.addChangeListener(colorTheme => {
+  //     // console.log(colorTheme);
+  //     if (colorTheme.colorScheme === 'dark') {
+  //       setTheme('DARK');
+  //     } else {
+  //       setTheme('LIGHT');
+  //     }
+  //   });
+  //   return () => {
+  //     listener;
+  //   };
+  // }, []);
 
   useEffect(() => {
     setItemList1(products);
@@ -44,6 +69,7 @@ const ProductList = () => {
         headers: headerData,
       })
       .then(resp => {
+        console.log('response-------------', resp.data);
         if (resp?.data) {
           setProducts(resp.data);
         } else {
@@ -90,53 +116,65 @@ const ProductList = () => {
   };
 
   return (
-    <View>
-      <Headline style={style.head}>Food Items</Headline>
-      <>
-        <View style={style.row}>
-          <Searchbar
-            style={style.searchBar}
-            placeholder="Search"
-            onChangeText={e => handleSearch(e)}
-          />
+    <ScrollView
+      style={{
+        backgroundColor: theme === 'light' ? '#EFECEC' : 'black',
+      }}>
+      <View  >
+        <Headline style={[style.head, {color: theme === 'light' ? 'purple' : "#B51B75"}]}>Food Items</Headline>
+        <>
+          <View style={style.row}>
+            <Searchbar
+              style={style.searchBar}
+              placeholder="Search"
+              onChangeText={e => handleSearch(e)}
+            />
 
-          <MaterialIcons
-            name="add"
-            style={{fontSize: 50, color: 'purple'}}
-            onPress={() => navigation.navigate('add')}
-          />
-        </View>
-      </>
+            <MaterialIcons
+              name="add"
+              style={{fontSize: 50, color: theme === 'light' ? 'purple' : "#B51B75"}}
+              onPress={() => navigation.navigate('add')}
+            />
+          </View>
+        </>
 
-      {itemList1.length > 0 ? (
-        <FlatList
-          data={itemList1}
-          renderItem={({item}) => (
-            <View keyExtractor={item => item._id} style={style.table}>
-              <Text style={{textTransform: 'uppercase', width: 75}}>
-                {item?.name}
-              </Text>
-              <Text style={{width: 50}}>₹ {item?.price}</Text>
-              <Text style={{width: 75}}>{item?.category}</Text>
+        <View>
+          {itemList1.length > 0 ? (
+            <FlatList
+              data={itemList1}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{paddingBottom: 10}}
+              renderItem={({item}) => (
+                <View keyExtractor={item => item._id} style={style.table}>
+                  <Text style={{textTransform: 'uppercase', width: 100}}>
+                    {item?.name}
+                  </Text>
+                  <Text style={{width: 50}}>₹ {item?.price}</Text>
+                  <Text style={{width: 80}}>{item?.category}</Text>
 
-              <MaterialIcons
-                name="edit"
-                style={{fontSize: 20, color: 'purple'}}
-                onPress={() => handleEdit(item)}
-              />
+                  <MaterialIcons
+                    name="edit"
+                    style={{fontSize: 20, color: theme === 'light' ? 'purple' : "#B51B75"}}
+                    onPress={() => handleEdit(item)}
+                  />
 
-              <MaterialIcons
-                name="delete"
-                style={{fontSize: 20, color: 'purple'}}
-                onPress={() => deleteProduct(item._id)}
-              />
-            </View>
+                  <MaterialIcons
+                    name="delete"
+                    style={{fontSize: 20, color: theme === 'light' ? 'purple' : "#B51B75"}}
+                    onPress={() => deleteProduct(item._id)}
+                  />
+                </View>
+              )}
+              ListEmptyComponent={()=>(
+                <Text style={{fontSize: 18, fontWeight:"500"}}>No Data Found</Text>
+              )}
+            />
+          ) : (
+            <ActivityIndicator animating={true} />
           )}
-        />
-      ) : (
-        <ActivityIndicator animating={true} />
-      )}
-    </View>
+        </View>
+      </View>
+     </ScrollView>
   );
 };
 

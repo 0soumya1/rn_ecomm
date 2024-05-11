@@ -1,9 +1,14 @@
-import {View, Text, ToastAndroid} from 'react-native';
+import {View, Text, ToastAndroid, Appearance} from 'react-native';
 import React, {useEffect, useState, useContext} from 'react';
 import {BASE_URL} from '../Const';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
-import {Button, Headline, TextInput, ActivityIndicator} from 'react-native-paper';
+import {
+  Button,
+  Headline,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native-paper';
 import {AuthContext} from '../AuthContext';
 import style from '../style';
 
@@ -15,11 +20,32 @@ const SignUp = () => {
   const {store, setStore} = useContext(AuthContext);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const [theme, setTheme] = useState('');
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const navigation = useNavigation();
 
   const toast = msg => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
   };
+
+  Appearance.addChangeListener(scheme => {
+    setTheme(scheme.colorScheme);
+  });
+
+  // useEffect(() => {
+  //   // const colorScheme = Appearance.getColorScheme();
+  //   const listener = Appearance.addChangeListener(colorTheme => {
+  //     console.log(colorTheme);
+  //     if (colorTheme.colorScheme === 'dark') {
+  //       setTheme('DARK');
+  //     } else {
+  //       setTheme('LIGHT');
+  //     }
+  //   });
+  //   return () => {
+  //     listener;
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (store.user) {
@@ -76,11 +102,15 @@ const SignUp = () => {
   };
 
   return (
-    <View>
-      <Headline style={style.heading}>Sign Up</Headline>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme === 'light' ? '#EFECEC' : '#070F2B',
+      }}>
+      <Headline style={[style.heading, {color: theme === 'light' ? 'purple' : "#B51B75"}]}>Sign Up</Headline>
       <TextInput
         style={style.inputs}
-        placeholder="Name"
+        placeholder="Enter Name"
         value={name}
         onChangeText={e => setName(e)}
       />
@@ -88,7 +118,7 @@ const SignUp = () => {
 
       <TextInput
         style={style.inputs}
-        placeholder="Email"
+        placeholder="Enter Email"
         value={email}
         onChangeText={e => setEmail(e)}
       />
@@ -96,7 +126,7 @@ const SignUp = () => {
 
       <TextInput
         style={style.inputs}
-        placeholder="Password"
+        placeholder="Enter Password"
         secureTextEntry={true}
         value={password}
         onChangeText={e => setPassword(e)}
@@ -108,15 +138,21 @@ const SignUp = () => {
       {!loading && (
         <Button
           textColor="white"
-          style={style.btn}
+          style={[style.btn, {backgroundColor : theme === "light" ? "purple" :"#B51B75"}]}
           onPress={() => collectData()}>
-          Save
+          <Text style={{color: 'white', fontSize: 16}}>Save</Text>
         </Button>
       )}
 
       {!store.user && (
         <Text
-          style={{margin: 20, alignSelf: 'center'}}
+          style={{
+            margin: 20,
+            alignSelf: 'center',
+            fontWeight: '600',
+            fontSize: 15,
+            color: theme === 'light' ? '#424769' : '#EFECEC',
+          }}
           onPress={handleFlickType}>
           {'Already have account? Sign In'}
         </Text>

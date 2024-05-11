@@ -7,21 +7,20 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 2,
-    margin: 3,
+    marginHorizontal: 5,
   },
 
   head: {
     fontSize: 22,
     alignSelf: 'center',
-    color: 'purple',
-    marginBottom: 10,
+    marginTop: 10,
+    marginBottom: 15,
     fontWeight: 'bold',
   },
 
   heading: {
     textAlign: 'center',
     marginVertical: 20,
-    color: 'purple',
     fontWeight: 'bold',
   },
 
@@ -32,21 +31,11 @@ export default StyleSheet.create({
   },
 
   btn: {
-    backgroundColor: 'purple',
     width: '40%',
     alignSelf: 'center',
     borderRadius: 40,
     margin: 5,
     paddingVertical: 3,
-  },
-
-  searchBar: {
-    marginBottom: 10,
-    backgroundColor: '#fff',
-    borderColor: 'purple',
-    borderWidth: 1,
-    elevation: 10,
-    width: '70%',
   },
 
   row: {
@@ -55,8 +44,25 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 5,
-    margin: 5,
+    marginHorizontal: 5,
+    marginBottom: 10,
   },
+
+  searchBar: {
+    flexDirection:"row",
+    alignItems:"center",
+    // textAlign:"center",
+    // alignSelf:"center",
+    backgroundColor: '#fff',
+    borderColor: 'purple',
+    borderWidth: 1,
+    elevation: 10,
+    width: '70%',
+    height: '95%',
+    // borderRadius:30
+    
+  },
+ 
 
   invalid: {
     color: 'red',

@@ -1,5 +1,5 @@
-import {View, Text, ToastAndroid} from 'react-native';
-import React, {useState, useContext} from 'react';
+import {View, Text, ToastAndroid, Appearance} from 'react-native';
+import React, {useState, useContext, useEffect} from 'react';
 import axios from 'axios';
 import {BASE_URL} from '../Const';
 import {useNavigation} from '@react-navigation/native';
@@ -19,6 +19,8 @@ const AddProduct = () => {
   const [category, setCategory] = useState('');
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const [theme, setTheme] = useState('');
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const {store, setStore} = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -29,6 +31,25 @@ const AddProduct = () => {
   const toast = msg => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.CENTER);
   };
+
+  Appearance.addChangeListener(scheme => {
+    setTheme(scheme.colorScheme);
+  });
+
+  // useEffect(() => {
+  //   // const colorScheme = Appearance.getColorScheme();
+  //   const listener = Appearance.addChangeListener(colorTheme => {
+  //     console.log(colorTheme);
+  //     if (colorTheme.colorScheme === 'dark') {
+  //       setTheme('DARK');
+  //     } else {
+  //       setTheme('LIGHT');
+  //     }
+  //   });
+  //   return () => {
+  //     listener;
+  //   };
+  // }, []);
 
   // const categoryOptions = [
   //   {value: 'Breakfast', label: 'Breakfast'},
@@ -68,7 +89,7 @@ const AddProduct = () => {
       .then(resp => {
         if (resp?.data) {
           toast('Item Added');
-          navigation.navigate("home", Math.random());
+          navigation.navigate('home', Math.random());
           setLoading(false);
         } else {
           toast('not found');
@@ -82,8 +103,12 @@ const AddProduct = () => {
   };
 
   return (
-    <View>
-      <Headline style={style.heading}>Add Item</Headline>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme === 'light' ? '#EFECEC' : 'black',
+      }}>
+      <Headline style={[style.heading, {color: theme === 'light' ? 'purple' : "#B51B75"}]}>Add Item</Headline>
 
       <TextInput
         style={style.inputs}
@@ -136,9 +161,9 @@ const AddProduct = () => {
       {!loading && (
         <Button
           textColor="white"
-          style={style.btn}
+          style={[style.btn, {backgroundColor : theme === "light" ? "purple" :"#B51B75"}]}
           onPress={() => addProduct()}>
-          Save
+          <Text style={{color: 'white', fontSize: 16}}>Save</Text>
         </Button>
       )}
       {loading && <ActivityIndicator animating={true} />}
